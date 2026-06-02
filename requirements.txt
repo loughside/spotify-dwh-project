@@ -1,0 +1,6 @@
+requests
+python-dotenv
+prefect
+dbt-sqlserver
+pyodbc
+pandas
