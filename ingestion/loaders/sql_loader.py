@@ -29,41 +29,31 @@ class SqlLoader:
         # Connect to the database
         self.cnxn = pyodbc.connect(cnxn_string)
           
-    def load_fixtures(self, fixtures):
+    def load_top_tracks(self, tracks: list, time_range: str, batch_id: str):
         # Create a cursor
         cursor = self.cnxn.cursor()
+
+        # Set variable values
         ingested_at = dt.datetime.now(dt.timezone.utc)
 
         # Write the MERGE T-SQL query
         merge_sql = (
             """
-            MERGE INTO 
-              bronze.fixtures AS target
-            USING 
-              (VALUES (?, ?, ?, ?)) AS source (fixture_id, json_response, ingested_at, api_endpoint)
-            ON 
-              target.fixture_id = source.fixture_id
-            WHEN MATCHED THEN UPDATE 
-              SET 
-                target.json_response = source.json_response,
-                target.ingested_at = source.ingested_at,
-                target.api_endpoint = source.api_endpoint
-            WHEN NOT MATCHED THEN
-                INSERT (fixture_id, json_response, ingested_at, api_endpoint)
-                  VALUES (
-                    source.fixture_id,
-                    source.json_response,
-                    source.ingested_at,
-                    source.api_endpoint);
+            INSERT INTO bronze.top_tracks 
+              (time_range, rank, raw_json, ingested_at, api_endpoint, batch_id)
+            VALUES 
+              (?, ?, ?, ?, ?, ?) 
             """
         )
 
-        for fixture in fixtures:
+        for rank, track in enumerate(tracks, start=1):
           values = (
-              fixture["fixture"]["id"],
-              json.dumps(fixture),
+              time_range,
+              rank,
+              json.dumps(track),
               ingested_at,
-              "fixtures"
+              "me/top/tracks",
+              batch_id
           )
           cursor.execute(merge_sql, values)
 
