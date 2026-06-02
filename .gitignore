@@ -1,0 +1,19 @@
+# Virtual environment
+venv/
+
+# Environment variables
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# dbt
+dbt/target/
+dbt/logs/
+dbt/.user.yml
+
+# OS
+.DS_Store
+Thumbs.db
