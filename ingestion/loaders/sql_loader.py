@@ -58,3 +58,33 @@ class SqlLoader:
           cursor.execute(merge_sql, values)
 
         self.cnxn.commit()
+
+    def load_top_artists(self, artists: list, time_range: str, batch_id: str):
+        # Create a cursor
+        cursor = self.cnxn.cursor()
+
+        # Set variable values
+        ingested_at = dt.datetime.now(dt.timezone.utc)
+
+        # Write the MERGE T-SQL query
+        merge_sql = (
+            """
+            INSERT INTO bronze.top_artists
+              (time_range, rank, raw_json, ingested_at, api_endpoint, batch_id)
+            VALUES 
+              (?, ?, ?, ?, ?, ?) 
+            """
+        )
+
+        for rank, artist in enumerate(artists, start=1):
+          values = (
+              time_range,
+              rank,
+              json.dumps(artist),
+              ingested_at,
+              "me/top/artists",
+              batch_id
+          )
+          cursor.execute(merge_sql, values)
+
+        self.cnxn.commit()
