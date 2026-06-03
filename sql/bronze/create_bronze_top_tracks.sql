@@ -8,5 +8,6 @@ IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'top_tracks' AND schema_id 
       raw_json NVARCHAR(MAX),
       ingested_at DATETIME2 DEFAULT GETUTCDATE(),
       api_endpoint NVARCHAR(100) NOT NULL,
+      batch_id NVARCHAR(100) NOT NULL,
       CONSTRAINT pk_top_tracks PRIMARY KEY (id))
     ')
