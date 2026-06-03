@@ -117,3 +117,32 @@ class SqlLoader:
           cursor.execute(merge_sql, values)
 
         self.cnxn.commit()
+
+    def load_saved_tracks(self, tracks: list, batch_id: str):
+        # Create a cursor
+        cursor = self.cnxn.cursor()
+
+        # Set variable values
+        ingested_at = dt.datetime.now(dt.timezone.utc)
+
+        # Write the MERGE T-SQL query
+        merge_sql = (
+            """
+            INSERT INTO bronze.saved_tracks
+              (raw_json, added_at, ingested_at, api_endpoint, batch_id)
+            VALUES 
+              (?, ?, ?, ?, ?) 
+            """
+        )
+
+        for track in tracks:
+          values = (
+              json.dumps(track),
+              track["added_at"],
+              ingested_at,
+              "me/tracks",
+              batch_id
+          )
+          cursor.execute(merge_sql, values)
+
+        self.cnxn.commit()
