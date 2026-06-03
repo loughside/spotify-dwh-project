@@ -146,3 +146,23 @@ class SqlLoader:
           cursor.execute(merge_sql, values)
 
         self.cnxn.commit()
+
+    def load_artists(self, artist: dict, batch_id: str):
+      cursor = self.cnxn.cursor()
+      ingested_at = dt.datetime.now(dt.timezone.utc)
+
+      insert_sql = """
+          INSERT INTO bronze.artists
+            (raw_json, ingested_at, api_endpoint, batch_id)
+          VALUES
+            (?, ?, ?, ?)
+      """
+
+      values = (
+          json.dumps(artist),
+          ingested_at,
+          "artists",
+          batch_id
+      )
+      cursor.execute(insert_sql, values)
+      self.cnxn.commit()
