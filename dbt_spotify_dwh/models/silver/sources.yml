@@ -1,0 +1,12 @@
+version: 2
+
+sources:
+  - name: bronze
+    schema: bronze
+    database: SpotifyDWH
+    tables:
+      - name: artists
+      - name: recently_played
+      - name: saved_tracks
+      - name: top_artists
+      - name: top_tracks
